@@ -1,0 +1,24 @@
+name: ppa
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+    create-ppa:
+        name: Create PPA
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+            
+             - name: Setup Go
+               uses: actions/setup-go@v1
+               with:
+                   go-version: 1.15
+
+            - name: Setup tmate session
+              uses: mxschmitt/action-tmate@v3
