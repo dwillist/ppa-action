@@ -1,7 +1,7 @@
 BINDIR := /usr/bin
 
 all:
-	go build main.go
+	go build -o go-hello
 
 install:
 	mkdir -p ${DESTDIR}${BINDIR}

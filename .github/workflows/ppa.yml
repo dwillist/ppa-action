@@ -15,14 +15,42 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v2
 
-            - name: Install packaging tools
-              run: |
-                  sudo apt install gnupg dput dh-make devscripts lintian
-            
             - name: Setup Go
               uses: actions/setup-go@v1
               with:
                   go-version: 1.15
+
+            - name: Metadata
+              id: metadata
+              run: |
+                  git_description=$(git describe --tags --long)
+                  version=$(echo "${git_description}" | awk -F- '{print $(1)}' | sed 's/^v//')
+                  revision=$(echo "${git_description}" | awk -F- '{print $(NF-1)}')
+                  commit=$(echo "${git_description}" | awk -F- '{print $(NF)}'  | sed 's/^g//')
+                  echo "::set-output name=version::$version"
+                  echo "::set-output name=revision::$revision"
+                  echo "::set-output name=commit::$commit"
+
+            - name: Install packaging tools
+              run: |
+                  sudo apt install gnupg dput dh-make devscripts lintian
+            
+            - name: Import gpg keys
+              env: # Or as an environment variable
+                GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE }}
+                GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC }}
+              run: |
+                  gpg --import <(echo "$GPG_PUBLIC_KEY")
+                  gpg --allow-secret-key-import --import <(echo "$GPG_PRIVATE_KEY")
+
+            - name: initialize PPA 
+              env: 
+                PACK_VERSION: ${{ steps.metadata.outputs.version }}
+                EMAIL: ${{ secrets.EMAIL }}
+              run: |
+                  dh_make -p "testpackage_$PACK_VERSION" --single --native --copyright mit --email "$EMAIL"
+                  rm debian/*.ex
+                  rm debian/*.EX
 
             - name: Setup tmate session
               uses: mxschmitt/action-tmate@v3
