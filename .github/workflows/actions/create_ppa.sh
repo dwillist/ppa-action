@@ -58,7 +58,7 @@ function main() {
 
 function import_gpg() {
     gpg --import <(echo "$GPG_PUBLIC_KEY")
-    gpg --batch --passphrase "$GPG_PRIVATE_PASSPHRASE" --allow-secret-key-import --import <(echo "$GPG_PRIVATE_KEY")
+    gpg --allow-secret-key-import --import <(echo "$GPG_PRIVATE_KEY")
 }
 
 main
