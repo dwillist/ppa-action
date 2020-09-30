@@ -26,7 +26,7 @@ jobs:
               run: |
                   # todo handle these error cases
                   #git_description=$(git describe --tags --long) || echo "0.0.0-001-$(git rev-parse --short HEAD)"
-                  git_description="$0.0.0-001-$(git rev-parse --short HEAD)"
+                  git_description="0.0.0-001-$(git rev-parse --short HEAD)"
                   version=$(echo "${git_description}" | awk -F- '{print $(1)}' | sed 's/^v//')
                   revision=$(echo "${git_description}" | awk -F- '{print $(NF-1)}')
                   commit=$(echo "${git_description}" | awk -F- '{print $(NF)}'  | sed 's/^g//')
@@ -36,29 +36,23 @@ jobs:
 
             - name: Install packaging tools
               run: |
-                  sudo apt install gnupg dput dh-make devscripts lintian
-            
-                  #- name: Import gpg keys
-                  #  env: # Or as an environment variable
-                  #    GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE }}
-                  #    GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC }}
-                  #  run: |
-                  #      gpg --import <(echo "$GPG_PUBLIC_KEY")
-                  #      gpg --allow-secret-key-import --import <(echo "$GPG_PRIVATE_KEY")
+                  sudo apt-get install gnupg dput dh-make devscripts lintian -y
 
-
-            - name: Setup tmate session
-              uses: mxschmitt/action-tmate@v3
-
-            - name: initialize PPA 
-              env: 
-                PACK_VERSION: ${{ steps.metadata.outputs.version }}
+                  
+            - name: Create PPA
+              env:
+                VERSION: ${{ steps.metadata.outputs.version }}
                 #EMAIL: ${{ secrets.EMAIL }}
-              run: |
-                  #dh_make -p "testpackage-$PACK_VERSION" --single --native --copyright mit --email "$EMAIL"
-                  dh_make -p "testpackage-$PACK_VERSION" --single --native --copyright mit --email thorntondwt@gmail.com
-                  rm debian/*.ex
-                  rm debian/*.EX
+                GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+                GPG_PRIVATE_PASSPHRASE: ${{ secrets.GPG_PRIVATE_PASSPHRASE }}
+                GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+              run: ./.github/workflows/actions/create_ppa.sh
 
-            - name: Setup tmate session
-              uses: mxschmitt/action-tmate@v3
+                  #- name: Setup tmate session
+                  #  env:
+                  #    VERSION: ${{ steps.metadata.outputs.version }}
+                  #    #EMAIL: ${{ secrets.EMAIL }}
+                  #    GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+                  #    GPG_PRIVATE_PASSPHRASE: ${{ secrets.GPG_PRIVATE_PASSPHRASE }}
+                  #    GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+                  # uses: mxschmitt/action-tmate@v3
