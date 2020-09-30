@@ -38,13 +38,20 @@ jobs:
               run: |
                   sudo apt-get install gnupg dput dh-make devscripts lintian -y
 
+            - name: Setup tmate session
+              env:
+                VERSION: ${{ steps.metadata.outputs.version }}
+                #EMAIL: ${{ secrets.EMAIL }}
+                GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+                GPG_PRIVATE_PASSPHRASE: ${{ secrets.GPG_PRIVATE_PASSPHRASE }}
+                GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+              uses: mxschmitt/action-tmate@v3
                   
             - name: Create PPA
               env:
                 VERSION: ${{ steps.metadata.outputs.version }}
                 #EMAIL: ${{ secrets.EMAIL }}
                 GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-                GPG_PRIVATE_PASSPHRASE: ${{ secrets.GPG_PRIVATE_PASSPHRASE }}
                 GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
               run: ./.github/workflows/actions/create_ppa.sh
 
