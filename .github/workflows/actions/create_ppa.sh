@@ -51,7 +51,7 @@ function main() {
 
     debuild -S
 
-    dput ppa:thorntondwt/testppa 
+    dput ppa:thorntondwt/testppa ../*.changes
     popd
     
 }
