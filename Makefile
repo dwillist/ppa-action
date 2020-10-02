@@ -5,5 +5,5 @@ all:
 
 install:
 	mkdir -p ${DESTDIR}${BINDIR}
-	cp my_hello_world ${DESTDIR}${BINDIR}/
+	cp go-hello ${DESTDIR}${BINDIR}/
 

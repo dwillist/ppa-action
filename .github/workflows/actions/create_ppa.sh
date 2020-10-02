@@ -49,7 +49,7 @@ function main() {
     perl -i -pe 's/^(Maintainer:) unknown/$1 thorntondwt/' debian/control
     perl -i -pe "s/^ -- unknown/ -- thorntondwt/" debian/changelog
 
-    debuild
+    debuild --preserve-envvar PATH
 
     dput ppa:thorntondwt/testppa ../*.changes
     popd
